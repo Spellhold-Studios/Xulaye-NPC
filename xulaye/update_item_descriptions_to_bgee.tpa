@@ -1,0 +1,16 @@
+
+
+DEFINE_PATCH_FUNCTION ~update_item_descriptions_to_bgee~ BEGIN
+  PATCH_IF (ENGINE_IS ~bgee bg2ee~) BEGIN
+    FOR (index = 0x54 ; index >= 0x50 ; index -= 4) BEGIN // loop through descriptions
+      READ_LONG index strref
+      PATCH_IF (strref < 2147483646 && strref >= 0) BEGIN // verify description is valid
+        READ_STRREF index description
+        INNER_PATCH_SAVE new_desc ~%description%~ BEGIN
+          REPLACE_TEXTUALLY ~\(\([%LNL%%MNL%%WNL%][ %TAB%]*\(%usab%\|%unus%\)[ %TAB%]*\)\(\([%LNL%%MNL%%WNL%].*\)*\)?\)~  ~~
+        END
+        SAY_EVALUATED index ~%new_desc%~
+      END
+    END
+  END
+END
